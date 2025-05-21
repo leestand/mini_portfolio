@@ -175,10 +175,10 @@ def analyze_reviews(api_key, reviews_text, product_name):
    
     try:
         # OpenAI 모듈 가져오기
-        import openai
+        from openai import OpenAI
        
-        # API 키 설정
-        openai.api_key = api_key
+        # API 클라이언트 생성
+        client = OpenAI(api_key=api_key)
        
         # 리뷰 텍스트가 너무 긴 경우 줄이기
         max_chars = 15000
@@ -204,9 +204,9 @@ def analyze_reviews(api_key, reviews_text, product_name):
 }}
 """
 
-        # API 호출
-        response = openai.ChatCompletion.create(
-            model="gpt-4.o-mini",
+        # API 호출 - 새 버전 방식으로 수정
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # 모델명 수정 (하이픈으로 교체)
             messages=[
                 {"role": "system", "content": "당신은 제품 리뷰를 분석하는 전문가입니다. 제공된 네이버 블로그 포스트를 기반으로 긍정적 의견, 부정적 의견, 전체 요약을 명확하게 요약합니다."},
                 {"role": "user", "content": prompt}
@@ -215,7 +215,7 @@ def analyze_reviews(api_key, reviews_text, product_name):
             max_tokens=1000
         )
        
-        # 결과 파싱
+        # 결과 파싱 - 새 버전 방식으로 수정
         result = json.loads(response.choices[0].message.content)
         return result["positive"], result["negative"], result["summary"]
    
